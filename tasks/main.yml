@@ -15,42 +15,46 @@
 # under the License.
 
 ---
-- name: Import GPG keys
-  become: True
-  rpm_key:
-    key: '{{ item }}'
-  with_items:
-      - https://packagecloud.io/prometheus-rpm/release/gpgkey
-      - https://raw.githubusercontent.com/lest/prometheus-rpm/master/RPM-GPG-KEY-prometheus-rpm
+- name: Incluse OS-specific variables
+  include_vars: '{{ ansible_os_family  }}.yml'
 
-- name: Have the prometheus repo configured
-  become: True
-  yum_repository:
-    name: prometheus
-    description: prometheus
-    baseurl: https://packagecloud.io/prometheus-rpm/release/el/7/$basearch
-    gpgcheck: yes
-    gpgkey:
-      - https://packagecloud.io/prometheus-rpm/release/gpgkey
-      - https://raw.githubusercontent.com/lest/prometheus-rpm/master/RPM-GPG-KEY-prometheus-rpm
-
+- name: Include RPM-based repo (when necessary)
+  include_tasks: CentOS/rpm-based-repo.yml
+  when: ansible_distribution == 'CentOS'
 
 - name: Ensure blackbox-exporter is installed
   become: True
   package:
-    name: blackbox_exporter
-    update_cache: yes
+    name: '{{ prometheus_blackbox_exporter_package_name }}'
 
 - name: Ensure configuration is installed
   become: True
   template:
     src: etc/prometheus/blackbox.yml
-    dest: /etc/prometheus/blackbox.yml
-  notify: blackbox-restart
+    dest: '{{ prometheus_blackbox_exporter_config_path }}'
+  notify: prometheus_blackbox_exporter-restart
+
+- name: Ensure start-up configuration is set (RedHat)
+  become: True
+  lineinfile:
+    path: /etc/default/blackbox_exporter
+    regexp: '^BLACKBOX_EXPORTER_OPTS='
+    line: 'BLACKBOX_EXPORTER_OPTS="--{{ " --".join(prometheus_blackbox_exporter_opts) }}"'
+  when: prometheus_blackbox_exporter_opts is defined and ansible_os_family == 'RedHat'
+  notify: prometheus_blackbox_exporter-restart
+
+- name: Ensure start-up configuration is set (FreeBSD)
+  become: True
+  lineinfile:
+    path: /etc/rc.conf
+    regexp: '^blackbox_exporter_args='
+    line: 'blackbox_exporter_args="--{{ " --".join(prometheus_blackbox_exporter_opts) }}"'
+  when: prometheus_blackbox_exporter_opts is defined and ansible_os_family == 'FreeBSD'
+  notify: prometheus_blackbox_exporter-restart
 
 - name: Ensure blackbox-exporter is started and enabled
   become: True
   service:
-    name: blackbox_exporter
+    name: '{{ prometheus_blackbox_exporter_service_name }}'
     state: started
     enabled: yes
