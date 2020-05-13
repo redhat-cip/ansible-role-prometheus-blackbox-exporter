@@ -2,18 +2,22 @@ modules:
   http_2xx:
     prober: http
     http:
+      fail-if-not-ssl: true
   http_post_2xx:
     prober: http
     http:
       method: POST
+      fail-if-not-ssl: true
   http_400:
     prober: http
     http:
       valid_status_codes: 400
+      fail-if-not-ssl: true
   http_401:
     prober: http
     http:
       valid_status_codes: 401
+      fail-if-not-ssl: true
   tcp_connect:
     prober: tcp
   pop3s_banner:
