@@ -30,7 +30,7 @@
 - name: Ensure configuration is installed
   become: True
   template:
-    src: etc/prometheus/blackbox.yml
+    src: etc/prometheus/blackbox.yml.j2
     dest: '{{ prometheus_blackbox_exporter_config_path }}'
   notify: prometheus_blackbox_exporter-restart
 
