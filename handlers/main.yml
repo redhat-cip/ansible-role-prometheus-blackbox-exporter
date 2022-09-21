@@ -15,8 +15,8 @@
 # under the License.
 
 ---
-- name: prometheus_blackbox_exporter-restart
-  become: True
-  service:
+- name: Prometheus_blackbox_exporter-restart
+  become: true
+  ansible.core.service:
     name: '{{ prometheus_blackbox_exporter_service_name }}'
     state: restarted

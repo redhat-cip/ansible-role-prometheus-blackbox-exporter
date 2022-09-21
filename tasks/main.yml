@@ -16,45 +16,46 @@
 
 ---
 - name: Incluse OS-specific variables
-  include_vars: '{{ ansible_os_family  }}.yml'
+  ansible.builtin.include_vars: '{{ ansible_os_family }}.yml'
 
 - name: Include RPM-based repo (when necessary)
-  include_tasks: CentOS/rpm-based-repo.yml
+  ansible.builtin.include_tasks: CentOS/rpm-based-repo.yml
   when: ansible_distribution == 'CentOS'
 
 - name: Ensure blackbox-exporter is installed
-  become: True
-  package:
+  become: true
+  ansible.builtin.package:
     name: '{{ prometheus_blackbox_exporter_package_name }}'
 
 - name: Ensure configuration is installed
-  become: True
-  template:
+  become: true
+  ansible.builtin.template:
     src: etc/prometheus/blackbox.yml.j2
     dest: '{{ prometheus_blackbox_exporter_config_path }}'
-  notify: prometheus_blackbox_exporter-restart
+    mode: 0640
+  notify: Prometheus_blackbox_exporter-restart
 
 - name: Ensure start-up configuration is set (RedHat)
-  become: True
-  lineinfile:
+  become: true
+  ansible.builtin.lineinfile:
     path: /etc/default/blackbox_exporter
     regexp: '^BLACKBOX_EXPORTER_OPTS='
     line: 'BLACKBOX_EXPORTER_OPTS="--{{ " --".join(prometheus_blackbox_exporter_opts) }}"'
   when: prometheus_blackbox_exporter_opts is defined and ansible_os_family == 'RedHat'
-  notify: prometheus_blackbox_exporter-restart
+  notify: Prometheus_blackbox_exporter-restart
 
 - name: Ensure start-up configuration is set (FreeBSD)
-  become: True
-  lineinfile:
+  become: true
+  ansible.builtin.lineinfile:
     path: /etc/rc.conf
     regexp: '^blackbox_exporter_args='
     line: 'blackbox_exporter_args="--{{ " --".join(prometheus_blackbox_exporter_opts) }}"'
   when: prometheus_blackbox_exporter_opts is defined and ansible_os_family == 'FreeBSD'
-  notify: prometheus_blackbox_exporter-restart
+  notify: Prometheus_blackbox_exporter-restart
 
 - name: Ensure blackbox-exporter is started and enabled
-  become: True
-  service:
+  become: true
+  ansible.builtin.service:
     name: '{{ prometheus_blackbox_exporter_service_name }}'
     state: started
-    enabled: yes
+    enabled: true

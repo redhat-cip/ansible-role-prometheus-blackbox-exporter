@@ -14,18 +14,20 @@
 dependencies: []
 
 galaxy_info:
+  role_name: ansible_role_prometheus_blackbox_exporter
+  namespace: redhat_cip
   author: redhat-cip
   description: An Ansible module for the Prometheus Blackbox Exporter
   company: "Red Hat"
   license: "Apache 2.0"
-  min_ansible_version: 2.0
+  min_ansible_version: "2.0"
   platforms:
     - name: EL
       versions:
-      - 7
+        - "7"
     - name: FreeBSD
       versions:
-      - 11
+        - "11.0"
   galaxy_tags:
     - prometheus
     - monitoring

@@ -8,6 +8,13 @@ modules:
     http:
       method: POST
       fail_if_not_ssl: true
+  http_200_client_cert:
+    prober: http
+    http:
+      fail_if_not_ssl: true
+      tls_config:
+        cert_file: /etc/prometheus/blackbox_certs/dci.crt
+        key_file: /etc/prometheus/blackbox_certs/dci.key
   http_400:
     prober: http
     http:
