@@ -32,6 +32,8 @@
   ansible.builtin.template:
     src: etc/prometheus/blackbox.yml.j2
     dest: '{{ prometheus_blackbox_exporter_config_path }}'
+    owner: root
+    group: prometheus
     mode: 0640
   notify: Prometheus_blackbox_exporter-restart
 
