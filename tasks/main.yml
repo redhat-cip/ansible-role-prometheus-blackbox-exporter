@@ -34,7 +34,7 @@
     dest: '{{ prometheus_blackbox_exporter_config_path }}'
     owner: root
     group: prometheus
-    mode: 0640
+    mode: "0640"
   notify: Prometheus_blackbox_exporter-restart
 
 - name: Ensure start-up configuration is set (RedHat)
