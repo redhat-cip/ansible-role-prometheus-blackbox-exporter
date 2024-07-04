@@ -1,4 +1,8 @@
 modules:
+  http_2xx_nossl:
+    prober: http
+    http:
+      fail_if_not_ssl: false
   http_2xx:
     prober: http
     http:
